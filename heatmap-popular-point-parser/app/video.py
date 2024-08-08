@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
 from dto.popular_point_request_dto import PopularPointRequestDTO
-from ..service.heatmap import get_popular_point_by_heatmap
 
 from ..domain.youtube_crawler import YoutubeCrawler
 
@@ -15,7 +14,7 @@ router = APIRouter(
 async def extract_popular_point(video_id: int, data: PopularPointRequestDTO):
     crawler = YoutubeCrawler()
     heatmap = crawler.get_most_replayed_heatmap(data.youtubeUrl)
-    popular_point = get_popular_point_by_heatmap(heatmap)
+    popular_point = heatmap.get_popular_points()
     return {"videoId": video_id, "popularPoint": popular_point}
 
 

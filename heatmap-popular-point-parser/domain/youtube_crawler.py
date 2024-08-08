@@ -10,21 +10,21 @@ from youtube_heatmap import YoutubeHeatmap
 
 
 class YoutubeCrawler:
-    driver: WebDriver
+    __driver: WebDriver
 
     def __init__(self):
-        self.driver = self.__create_selenium_driver()
+        self.__driver = self.__create_selenium_driver()
 
     def get_most_replayed_heatmap(self, video_url: str) -> YoutubeHeatmap:
         try:
-            self.driver.get(video_url)
+            self.__driver.get(video_url)
             self.__wait_for_ad()
             self.__wait_for_video()
             return self.__get_youtube_heatmap()
         except Exception as e:
             raise Exception("Failed to get heatmap" + e)
         finally:
-            self.driver.quit()
+            self.__driver.quit()
 
     def __create_selenium_driver(self):
         options = webdriver.ChromeOptions()
@@ -37,7 +37,7 @@ class YoutubeCrawler:
 
     def __wait_for_ad(self):
         try:
-            skip_ad_button = WebDriverWait(self.driver, 15).until(
+            skip_ad_button = WebDriverWait(self.__driver, 15).until(
                 ec.element_to_be_clickable(("class name", "ytp-ad-skip-button"))
             )
             skip_ad_button.click()
@@ -45,12 +45,12 @@ class YoutubeCrawler:
             pass
 
     def __wait_for_video(self):
-        WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.__driver, 10).until(
             ec.presence_of_element_located(("css selector", "video"))
         )
 
     def __get_youtube_heatmap(self) -> YoutubeHeatmap:
-        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+        soup = BeautifulSoup(self.__driver.page_source, "html.parser")
 
         return YoutubeHeatmap(
             svgs=self.__get_chapter_svgs(soup),
