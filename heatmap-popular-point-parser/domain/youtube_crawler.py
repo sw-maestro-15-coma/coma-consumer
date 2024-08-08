@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
-from ..domain.youtube_heatmap import YoutubeHeatmap
+from youtube_heatmap import YoutubeHeatmap
 
 
 class YoutubeCrawler:

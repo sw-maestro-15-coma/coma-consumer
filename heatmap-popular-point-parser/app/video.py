@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from ..app.dto.popular_point_request_dto import PopularPointRequestDTO
+from dto.popular_point_request_dto import PopularPointRequestDTO
 from ..service.heatmap import get_popular_point_by_heatmap
 
-from ..util.youtube_crawler import YoutubeCrawler
+from ..domain.youtube_crawler import YoutubeCrawler
 
 router = APIRouter(
     prefix="/video",

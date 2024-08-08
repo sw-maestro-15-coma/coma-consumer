@@ -1,3 +1,5 @@
+from svg import SVGPoint
+
 MAX_SVG_WIDTH = 1000
 
 
@@ -13,13 +15,13 @@ class YoutubeHeatmap:
         self.total_width = sum(chapter_widths)
         self.video_length = video_length
 
-    def get_time_from_video(self, chapter_idx: int, svg_point: int) -> int:
-        prev_video_time = sum(self.get_chapter_time(i) for i in range(chapter_idx))
-        video_time = self.get_chapter_time(chapter_idx)
-        current_point = svg_point / MAX_SVG_WIDTH * video_time
+    def get_time_from_video(self, chapter_idx: int, svg_point: SVGPoint) -> int:
+        prev_video_time = sum(self.__get_chapter_time(i) for i in range(chapter_idx))
+        video_time = self.__get_chapter_time(chapter_idx)
+        current_point = int(svg_point.x) / MAX_SVG_WIDTH * video_time
 
         return int(prev_video_time + current_point)
 
-    def get_chapter_time(self, index: int) -> float:
+    def __get_chapter_time(self, index: int) -> float:
         width = self.chapter_widths[index]
         return (width / self.total_width) * self.video_length

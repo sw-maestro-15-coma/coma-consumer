@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from ..app.video import router
+from video import router
 
 app = FastAPI()
 
