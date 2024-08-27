@@ -10,7 +10,7 @@ ENV LC_ALL ko_KR.UTF-8
 
 # Install yt-dlp
 RUN apt install -y yt-dlp
-
+RUN apt install -y ffmpeg
 # Install python dependencies
 RUN pip3 install -r requirements.txt
 
