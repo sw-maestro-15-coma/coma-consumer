@@ -31,6 +31,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Insert env file
+        run: |
+          echo ${{ secrets.ENV_FILE }} > .env
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
