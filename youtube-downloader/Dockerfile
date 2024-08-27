@@ -1,5 +1,7 @@
 FROM python:3.12
-WORKDIR /
+
+# Set the working directory
+COPY . /app
 
 # Set the locale
 RUN apt update && apt install -y locales
@@ -10,11 +12,9 @@ ENV LC_ALL ko_KR.UTF-8
 
 # Install yt-dlp
 RUN apt install -y yt-dlp
-
+RUN apt install -y ffmpeg
 # Install python dependencies
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r /app/requirements.txt
 
 # Run the main.py
-ENTRYPOINT ["python3", "main.py"]
-
-## TODO : 수정이 더 필요합니다 (requirements.txt 파일이 없습니다)
+ENTRYPOINT ["python3", "/app/main.py"]
