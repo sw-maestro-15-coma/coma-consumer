@@ -10,7 +10,8 @@ from dto.shorts_response_message import ShortsResponseMessage
 class ShortsService:
     __S3_URL = "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/"
 
-    def __init__(self, shorts_processor: ShortsProcessor,
+    def __init__(self,
+                 shorts_processor: ShortsProcessor,
                  id_generator: IdGenerator,
                  shorts_repository: ShortsRepository) -> None:
         self.shorts_processor = shorts_processor
@@ -20,8 +21,8 @@ class ShortsService:
     def make_shorts(self, message: ShortsRequestMessage) -> ShortsResponseMessage:
         uuid: int = self.id_generator.make_id()
 
-        text_path = f"/Users/choejaewon/Desktop/projects/text/{uuid}.txt"
-        output_path = f"/Users/choejaewon/Desktop/projects/test/{uuid}.mp4"
+        text_path = f"/text/{uuid}.txt"
+        output_path = f"/output/{uuid}.mp4"
 
         text_file = open(text_path, 'w+t')
         text_file.write(message.top_title)

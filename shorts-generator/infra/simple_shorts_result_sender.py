@@ -6,8 +6,7 @@ from domain.shorts_result_sender import ShortsResultSender
 from dto.shorts_response_message import ShortsResponseMessage
 
 class SimpleShortsResultSender(ShortsResultSender):
-    def __init__(self):
-        self.__API_SERVER_URL = "https://api.cotuber.com/api/v1/message/"
+    __API_SERVER_URL = "https://api.cotuber.com/api/v1/message/"
 
     def send_success(self, shorts_response_message: ShortsResponseMessage) -> None:
         headers = {'Content-Type': 'application/json; charset;utf-8'}

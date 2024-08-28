@@ -1,21 +1,16 @@
-import logging
 import subprocess
 
 from domain.shorts_processor import ShortsProcessor
 from dto.shorts_request import ShortsRequest
 
 class FfmpegShortsProcessor(ShortsProcessor):
-    #__FONT_PATH = "/usr/share/fonts/truetype/extrabold.ttf"
-    __FONT_PATH = "/Users/choejaewon/Desktop/projects/shorts-generator-python/shorts-generator/extrabold.ttf"
+    __FONT_PATH = "/usr/share/fonts/truetype/extrabold.ttf"
 
     def execute(self, request: ShortsRequest) -> None:
         print(self.__get_command(request=request))
 
         result = subprocess.run(args=self.__get_command(request),
                                 capture_output=True)
-
-        print(result.stdout)
-        print(result.stderr)
 
         if result.returncode != 0:
             raise RuntimeError("shorts 생성에 실패했습니다")

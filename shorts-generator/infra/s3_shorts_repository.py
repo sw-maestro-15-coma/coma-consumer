@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from domain.shorts_repository import ShortsRepository
 
 class S3ShortsRepository(ShortsRepository):
-    def __init__(self):
+    def __init__(self) -> None:
         self.__s3_bucket_name = "video-process-test-bucket"
         self.__s3_bucket_url = "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/"
         self.client = boto3.client("s3",
