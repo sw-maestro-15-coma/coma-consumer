@@ -1,0 +1,27 @@
+import json
+
+import requests
+
+from domain.shorts_result_sender import ShortsResultSender
+from dto.shorts_response_message import ShortsResponseMessage
+
+class SimpleShortsResultSender(ShortsResultSender):
+    def __init__(self):
+        self.__API_SERVER_URL = "https://api.cotuber.com/api/v1/message/"
+
+    def send_success(self, shorts_response_message: ShortsResponseMessage) -> None:
+        headers = {'Content-Type': 'application/json; charset;utf-8'}
+        data = {
+            'shortsId': shorts_response_message.shorts_id,
+            'videoId': shorts_response_message.video_id,
+            'link': shorts_response_message.link
+        }
+        requests.post(self.__API_SERVER_URL + "shorts", data=json.dumps(data), headers=headers)
+
+    def send_fail(self, message: str, shorts_id: int) -> None:
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        data = {
+            "shortsId": shorts_id,
+            "message": message
+        }
+        requests.post(self.__API_SERVER_URL + "fail", data=json.dumps(data), headers=headers)
