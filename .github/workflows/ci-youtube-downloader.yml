@@ -19,6 +19,7 @@ jobs:
           filters: |
             files:
               - 'youtube-downloader/**'
+              - '.github/workflows/ci-youtube-downloader.yml'
     outputs:
       files: ${{ steps.compute_diff.outputs.files }}
 
