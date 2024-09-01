@@ -34,7 +34,7 @@ jobs:
 
       - name: Insert env file
         run: |
-          echo ${{ secrets.YOUTUBE_DOWNLOADER_ENV_FILE }} > .env
+          echo ${{ secrets.YOUTUBE_DOWNLOADER_ENV_FILE }} > youtube-downloader/.env
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
