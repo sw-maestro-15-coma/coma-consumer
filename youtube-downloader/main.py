@@ -2,6 +2,7 @@ import recv, sys, os
 from dotenv import load_dotenv
 
 if __name__ == '__main__':
+    print('[youtube-downloader] Starting consumer...')
     load_dotenv()
     host = os.environ.get('HOST')
     try:
