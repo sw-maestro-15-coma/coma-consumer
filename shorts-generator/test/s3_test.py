@@ -2,15 +2,20 @@ import unittest
 
 import boto3
 
+from config import Config
 
-class MyTestCase(unittest.TestCase):
+
+class S3Test(unittest.TestCase):
     def test_s3_client(self):
         s3_client = boto3.client("s3",
-                             region_name="ap-northeast-2",
-                             aws_access_key_id='AKIA6GBMEHUUKC7J7Y53',
-                             aws_secret_access_key='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')
+                             region_name=Config.region(),
+                             aws_access_key_id=Config.aws_access_key(),
+                             aws_secret_access_key=Config.aws_secret_key())
         response = s3_client.list_buckets(MaxBuckets=123)
-        print(response['Buckets'][0]['Name'])
+        expected: str = "video-process-test-bucket"
+        bucket_name: str = response['Buckets'][0]['Name']
+
+        self.assertEqual(expected, bucket_name)
 
 if __name__ == '__main__':
     unittest.main()

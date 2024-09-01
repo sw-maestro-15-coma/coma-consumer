@@ -1,5 +1,6 @@
 import uuid
 
 class IdGenerator:
-    def make_id(self) -> int:
+    @staticmethod
+    def make_id() -> int:
         return uuid.uuid4().int

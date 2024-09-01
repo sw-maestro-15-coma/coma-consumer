@@ -1,5 +1,7 @@
 import os
+from typing import AnyStr
 
+from config import Config
 from domain.id_generator import IdGenerator
 from domain.shorts_processor import ShortsProcessor
 from domain.shorts_repository import ShortsRepository
@@ -8,7 +10,7 @@ from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
 
 class ShortsService:
-    __S3_URL = "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/"
+    __S3_URL = Config.s3_url()
 
     def __init__(self,
                  shorts_processor: ShortsProcessor,
@@ -21,12 +23,9 @@ class ShortsService:
     def make_shorts(self, message: ShortsRequestMessage) -> ShortsResponseMessage:
         uuid: int = self.id_generator.make_id()
 
-        text_path = f"/text/{uuid}.txt"
-        output_path = f"/output/{uuid}.mp4"
-
-        text_file = open(text_path, 'w+t')
-        text_file.write(message.top_title)
-        text_file.close()
+        text_path: str = self.__make_temp_text_path(uuid=uuid,
+                                               top_title=message.top_title)
+        output_path: str = self.__make_temp_output_path(uuid=uuid)
 
         self.shorts_processor.execute(self.__message_to_request(message,
                                                                 text_path=text_path,
@@ -39,9 +38,10 @@ class ShortsService:
 
         return ShortsResponseMessage(video_id=message.video_id,
                                      shorts_id=message.shorts_id,
-                                     link=self.__S3_URL + f"{uuid}.mp4")
+                                     link=self.__S3_URL + f"process/{uuid}.mp4")
 
-    def __message_to_request(self, message: ShortsRequestMessage,
+    @staticmethod
+    def __message_to_request(message: ShortsRequestMessage,
                              text_path: str,
                              output_path: str) -> ShortsRequest:
         return ShortsRequest(s3_url=message.video_s3_url,
@@ -50,8 +50,32 @@ class ShortsService:
                       text_path=text_path,
                       output_path=output_path)
 
-    def __remove_temp_files(self, text_path: str, output_path: str) -> None:
+    @staticmethod
+    def __remove_temp_files(text_path: str, output_path: str) -> None:
         if os.path.isfile(text_path):
             os.remove(text_path)
         if os.path.isfile(output_path):
             os.remove(output_path)
+
+    def __make_temp_text_path(self, uuid: int, top_title: str) -> str:
+        text_path: str = Config.text_path() + f"/{uuid}.txt"
+
+        self.__make_dir_if_not_exists(text_path)
+
+        with open(text_path, "w+t") as file:
+            file.write(top_title)
+        return text_path
+
+    def __make_temp_output_path(self, uuid: int) -> str:
+        output_path: str = Config.output_path() + f"/{uuid}.mp4"
+
+        self.__make_dir_if_not_exists(output_path)
+
+        return output_path
+
+    @staticmethod
+    def __make_dir_if_not_exists(path: str) -> None:
+        dir_name: AnyStr = os.path.dirname(path)
+
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)

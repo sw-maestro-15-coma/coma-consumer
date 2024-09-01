@@ -5,6 +5,7 @@ import pika
 from pika.adapters.blocking_connection import BlockingConnection, BlockingChannel
 
 from application.shorts_service import ShortsService
+from config import Config
 from domain.shorts_result_sender import ShortsResultSender
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
@@ -19,7 +20,7 @@ class RabbitMQConsumer:
     def start(self) -> None:
         connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202"))
         channel: BlockingChannel = connection.channel()
-        channel.queue_declare(queue="shorts-process")
+        channel.queue_declare(queue=Config.queue_name())
 
         def callback(ch: BlockingChannel, method, properties, body):
             data: dict = json.loads(body.decode('utf-8'))
@@ -49,6 +50,6 @@ class RabbitMQConsumer:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
 
         channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue="shorts-process", on_message_callback=callback, auto_ack=False)
+        channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=False)
 
         channel.start_consuming()

@@ -1,10 +1,11 @@
 import subprocess
 
+from config import Config
 from domain.shorts_processor import ShortsProcessor
 from dto.shorts_request import ShortsRequest
 
 class FfmpegShortsProcessor(ShortsProcessor):
-    __FONT_PATH = "/usr/share/fonts/truetype/extrabold.ttf"
+    __FONT_PATH = Config.font_path()
 
     def execute(self, request: ShortsRequest) -> None:
         print(self.__get_command(request=request))

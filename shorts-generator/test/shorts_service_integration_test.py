@@ -5,7 +5,7 @@ from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
 from object_factory import ObjectFactory
 
-class MyTestCase(unittest.TestCase):
+class ShortsServiceIntegrationTest(unittest.TestCase):
     def test_work(self):
         shorts_service: ShortsService = ObjectFactory.shorts_service()
 
