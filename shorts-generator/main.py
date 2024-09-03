@@ -1,5 +1,4 @@
 import logging
-from http.server import BaseHTTPRequestHandler
 
 from object_factory import ObjectFactory
 

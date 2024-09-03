@@ -1,7 +1,5 @@
 
 class Config:
-    __state: str = "test"
-
     @staticmethod
     def aws_access_key() -> str:
         return "AKIA6GBMEHUUKC7J7Y53"
@@ -26,24 +24,18 @@ class Config:
     def queue_name() -> str:
         return "shorts-process"
 
-    @classmethod
-    def font_path(cls) -> str:
-        if cls.__state == "test":
-            return "/Users/choejaewon/Desktop/projects/coma-consumer-clone/coma-consumer/shorts-generator/extrabold.ttf"
+    @staticmethod
+    def font_path() -> str:
         return "/usr/share/fonts/truetype/extrabold.ttf"
 
     @staticmethod
     def s3_url() -> str:
         return "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/"
 
-    @classmethod
-    def text_path(cls) -> str:
-        if cls.__state == "test":
-            return "/Users/choejaewon/Desktop/text"
+    @staticmethod
+    def text_path() -> str:
         return "/text"
 
-    @classmethod
-    def output_path(cls) -> str:
-        if cls.__state == "test":
-            return "/Users/choejaewon/Desktop/output"
+    @staticmethod
+    def output_path() -> str:
         return "/output"
