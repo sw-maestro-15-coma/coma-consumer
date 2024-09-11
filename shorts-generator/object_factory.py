@@ -20,12 +20,17 @@ class ObjectFactory:
     @classmethod
     def shorts_service(cls) -> ShortsService:
         return ShortsService(shorts_processor=cls.shorts_processor(),
+                             id_generator=cls.id_generator(),
                              shorts_repository=cls.shorts_repository(),
                              shorts_thumbnail_maker=cls.shorts_thumbnail_maker())
 
     @classmethod
     def shorts_processor(cls) -> ShortsProcessor:
         return FfmpegShortsProcessor()
+
+    @classmethod
+    def id_generator(cls) -> IdGenerator:
+        return IdGenerator()
 
     @classmethod
     def shorts_repository(cls) -> ShortsRepository:
