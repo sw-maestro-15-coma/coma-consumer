@@ -16,9 +16,10 @@ class FfmpegShortsProcessor(ShortsProcessor):
                                 capture_output=True)
 
         if result.returncode != 0:
-            raise RuntimeError("shorts 생성에 실패했습니다")
+            raise RuntimeError("shorts 생성에 실패했습니다 : 에러 코드 - " + f"{result.returncode}")
 
         return output_path
+
 
     def __get_command(self, request: ShortsRequest, output_path: str) -> list[str]:
         return [

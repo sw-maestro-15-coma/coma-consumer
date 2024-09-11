@@ -14,7 +14,7 @@ class FfmpegShortsThumbnailMaker(ShortsThumbnailMaker):
                                     capture_output=True)
 
         if result.returncode != 0:
-            raise RuntimeError("shorts 생성에 실패했습니다")
+            raise RuntimeError("shorts 생성에 실패했습니다 : 에러 코드 - " + f"{result.returncode}")
         return output_path
 
     @staticmethod
@@ -25,7 +25,9 @@ class FfmpegShortsThumbnailMaker(ShortsThumbnailMaker):
             shorts_path,
             '-ss',
              '00:00:00',
-            '-vframes',
+            '-frames:v',
+            '1',
+            '-update',
             '1',
             output_path
         ]

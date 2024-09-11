@@ -20,7 +20,7 @@ class ShortsService:
 
     def make_shorts(self, message: ShortsRequestMessage) -> ShortsResponseMessage:
         temp_text_file = TempTextFile()
-        temp_text_file.write_to_file(message.top_title)
+        temp_text_file.write_to_file(self.__add_next_line_if_over_10(message.top_title))
         text_path: str = temp_text_file.get_text_path()
 
         output_path: str = self.__shorts_processor.execute(self.__message_to_request(message, text_path=text_path))
@@ -52,3 +52,16 @@ class ShortsService:
                     os.remove(path)
         except Exception as e:
             raise RuntimeError(e)
+
+
+    @staticmethod
+    def __add_next_line_if_over_10(title: str) -> str:
+        if len(title) <= 10:
+            return title
+
+        full_length: int = len(title)
+
+        first: str = title[:full_length // 2]
+        second: str = title[full_length // 2:]
+
+        return first + '\n' + second

@@ -22,7 +22,7 @@ class S3ShortsRepository(ShortsRepository):
             file_name: AnyStr = self.__extract_file_name(output_path)
             self.client.upload_file(output_path, self.__s3_bucket_name, 'process/' + file_name)
 
-            return self.__s3_bucket_name + 'process/' + file_name
+            return Config.s3_url() + '/process/' + file_name
         except ClientError as e:
             logger.error(e)
             raise
@@ -30,9 +30,9 @@ class S3ShortsRepository(ShortsRepository):
     def post_thumbnail(self, thumbnail_path: str) -> str:
         try:
             file_name: AnyStr = self.__extract_file_name(thumbnail_path)
-            self.client.upload_file(thumbnail_path, self.__s3_bucket_name, 'thumbnail/' + file_name)
+            self.client.upload_file(thumbnail_path, self.__s3_bucket_name, 'thumbnails/' + file_name)
 
-            return self.__s3_bucket_name + 'thumbnail/' + file_name
+            return Config.s3_url() + '/thumbnails/' + file_name
         except ClientError as e:
             logger.error(e)
             raise
