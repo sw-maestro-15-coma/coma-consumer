@@ -1,33 +1,31 @@
 import subprocess
 
+from config import Config
+from domain.id_generator import IdGenerator
 from domain.shorts_thumbnail_maker import ShortsThumbnailMaker
 
 class FfmpegShortsThumbnailMaker(ShortsThumbnailMaker):
-    def execute(self, shorts_link: str) -> str:
-        __FONT_PATH = Config.font_path()
+    def execute(self, shorts_path: str) -> str:
+        uuid: int = IdGenerator.make_id()
 
+        output_path: str = Config.thumbnail_path() + f"/{uuid}.png"
 
-        print(self.__get_command(request=request))
-
-        result = subprocess.run(args=self.__get_command(request),
+        result = subprocess.run(args=self.__get_command(shorts_path=shorts_path, output_path=output_path),
                                     capture_output=True)
 
         if result.returncode != 0:
             raise RuntimeError("shorts 생성에 실패했습니다")
+        return output_path
 
-    def __get_command(self, shorts_path: str, thumbnail_path: str) -> list[str]:
+    @staticmethod
+    def __get_command(shorts_path: str, output_path: str) -> list[str]:
         return [
-                'ffmpeg',
-                '-i',
-                shorts_path
-                '-vf',
-                self.__get_video_filter(request.text_path),
-                '-ss',
-                request.start,
-                '-to',
-                request.end,
-                '-f',
-                'mp4',
-                '-y',
-                request.output_path
+            'ffmpeg',
+            '-i',
+            shorts_path,
+            '-ss',
+             '00:00:00',
+            '-vframes',
+            '1',
+            output_path
         ]
