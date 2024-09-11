@@ -1,48 +1,54 @@
-from config import Config
-from domain.id_generator import IdGenerator
+import os
+
 from domain.shorts_processor import ShortsProcessor
 from domain.shorts_repository import ShortsRepository
-from domain.temp_files import TempFiles
+from domain.shorts_thumbnail_maker import ShortsThumbnailMaker
+from domain.temp_text_file import TempTextFile
 from dto.shorts_request import ShortsRequest
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
 
-class ShortsService:
-    __S3_URL = Config.s3_url()
 
+class ShortsService:
     def __init__(self,
                  shorts_processor: ShortsProcessor,
-                 id_generator: IdGenerator,
-                 shorts_repository: ShortsRepository) -> None:
-        self.shorts_processor = shorts_processor
-        self.id_generator = id_generator
-        self.shorts_repository = shorts_repository
+                 shorts_repository: ShortsRepository,
+                 shorts_thumbnail_maker: ShortsThumbnailMaker) -> None:
+        self.__shorts_processor = shorts_processor
+        self.__shorts_repository = shorts_repository
+        self.__shorts_thumbnail_maker = shorts_thumbnail_maker
 
     def make_shorts(self, message: ShortsRequestMessage) -> ShortsResponseMessage:
-        uuid: int = self.id_generator.make_id()
+        temp_text_file = TempTextFile()
+        temp_text_file.write_to_file(message.top_title)
+        text_path: str = temp_text_file.get_text_path()
 
-        temp_files: TempFiles = TempFiles(uuid= uuid,
-                                          top_title=message.top_title)
-        text_path: str = temp_files.get_text_path()
-        output_path: str = temp_files.get_output_path()
+        output_path: str = self.__shorts_processor.execute(self.__message_to_request(message, text_path=text_path))
+        thumbnail_path: str = self.__shorts_thumbnail_maker.execute(shorts_path=output_path)
 
-        self.shorts_processor.execute(self.__message_to_request(message,
-                                                                text_path=text_path,
-                                                                output_path=output_path))
-        self.shorts_repository.post_shorts(output_path=output_path, file_name=f"{uuid}.mp4")
+        shorts_link: str = self.__shorts_repository.post_shorts(output_path=output_path)
+        thumbnail_link: str = self.__shorts_repository.post_thumbnail(thumbnail_path=thumbnail_path)
 
-        temp_files.remove()
+        self.__remove_all_temp_files([text_path, output_path, thumbnail_path])
 
         return ShortsResponseMessage(video_id=message.video_id,
                                      shorts_id=message.shorts_id,
-                                     link=self.__S3_URL + f"process/{uuid}.mp4")
+                                     shorts_link=shorts_link,
+                                     thumbnail_link=thumbnail_link)
 
     @staticmethod
     def __message_to_request(message: ShortsRequestMessage,
-                             text_path: str,
-                             output_path: str) -> ShortsRequest:
+                             text_path: str) -> ShortsRequest:
         return ShortsRequest(s3_url=message.video_s3_url,
                       start=message.start_time,
                       end=message.end_time,
-                      text_path=text_path,
-                      output_path=output_path)
+                      text_path=text_path)
+
+    @staticmethod
+    def __remove_all_temp_files(path_list: list[str]) -> None:
+        try:
+            for path in path_list:
+                if os.path.isfile(path):
+                    os.remove(path)
+        except Exception as e:
+            raise RuntimeError(e)

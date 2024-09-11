@@ -14,7 +14,7 @@ class Config:
 
     @staticmethod
     def api_server_url() -> str:
-        return "https://api.cotuber.com/api/v1/message/"
+        return "https://api.cotuber.com/api/v1/message"
 
     @staticmethod
     def s3_bucket_name() -> str:
@@ -30,7 +30,7 @@ class Config:
 
     @staticmethod
     def s3_url() -> str:
-        return "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/"
+        return "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com"
 
     @staticmethod
     def text_path() -> str:
@@ -39,3 +39,7 @@ class Config:
     @staticmethod
     def output_path() -> str:
         return "/output"
+
+    @staticmethod
+    def thumbnail_path() -> str:
+        return "/thumbnail"

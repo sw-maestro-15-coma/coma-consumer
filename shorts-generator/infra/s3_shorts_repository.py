@@ -14,9 +14,11 @@ class S3ShortsRepository(ShortsRepository):
                              aws_access_key_id=Config.aws_access_key(),
                              aws_secret_access_key=Config.aws_secret_key())
 
-    def post_shorts(self, output_path: str, file_name: str) -> None:
+    def post_shorts(self, output_path: str, file_name: str) -> str:
         try:
             self.client.upload_file(output_path, self.__s3_bucket_name, 'process/' + file_name)
+
+            return self.__s3_bucket_name + 'process/' + file_name
         except ClientError as e:
             logger.error(e)
             raise

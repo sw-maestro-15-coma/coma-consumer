@@ -7,7 +7,6 @@ from config import Config
 from domain.id_generator import IdGenerator
 from domain.shorts_processor import ShortsProcessor
 from domain.shorts_repository import ShortsRepository
-from domain.temp_files import TempFiles
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
 
@@ -17,7 +16,7 @@ class ShortsServiceTest(unittest.TestCase):
     mock_shorts_repository: ShortsRepository = Mock()
     mock_shorts_id_generator: IdGenerator = Mock()
 
-    @patch("application.shorts_service.TempFiles")
+    @patch("application.shorts_service.ShortsTempFiles")
     def test_success(self, MockTempFiles) -> None:
         self.mock_shorts_id_generator.make_id.return_value = 1234
         MockTempFiles.mock_temp_files.remove.return_value = None
