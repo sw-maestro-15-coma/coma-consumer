@@ -1,22 +1,26 @@
 import subprocess
 
 from config import Config
+from domain.id_generator import IdGenerator
 from domain.shorts_processor import ShortsProcessor
 from dto.shorts_request import ShortsRequest
 
 class FfmpegShortsProcessor(ShortsProcessor):
     __FONT_PATH = Config.font_path()
 
-    def execute(self, request: ShortsRequest) -> None:
-        print(self.__get_command(request=request))
+    def execute(self, request: ShortsRequest) -> str:
+        uuid: int = IdGenerator.make_id()
+        output_path: str = Config.output_path() + f"/{uuid}.mp4"
 
-        result = subprocess.run(args=self.__get_command(request),
+        result = subprocess.run(args=self.__get_command(request, output_path),
                                 capture_output=True)
 
         if result.returncode != 0:
             raise RuntimeError("shorts 생성에 실패했습니다")
 
-    def __get_command(self, request: ShortsRequest) -> list[str]:
+        return output_path
+
+    def __get_command(self, request: ShortsRequest, output_path: str) -> list[str]:
         return [
             'ffmpeg',
             '-i',
@@ -30,7 +34,7 @@ class FfmpegShortsProcessor(ShortsProcessor):
             '-f',
             'mp4',
             '-y',
-            request.output_path
+            output_path
         ]
 
     def __get_video_filter(self, text_path: str) -> str:
