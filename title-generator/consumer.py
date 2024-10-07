@@ -5,7 +5,7 @@ from pika.channel import Channel
 from pika.spec import BasicProperties
 from pika.spec import Basic
 
-from main import create_shorts_title_gpt
+from title_generator import create_shorts_title_gpt
 from result_sender import send_fail, send_success
 
 __QUEUE_IP = "54.180.140.202"
