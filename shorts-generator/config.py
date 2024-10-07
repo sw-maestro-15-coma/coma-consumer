@@ -37,6 +37,10 @@ class Config:
         return "/text"
 
     @staticmethod
+    def subtitle_path() -> str:
+        return "/subtitle"
+
+    @staticmethod
     def output_path() -> str:
         return "/output"
 
