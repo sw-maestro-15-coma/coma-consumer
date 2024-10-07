@@ -3,7 +3,7 @@ from typing import AnyStr
 
 from config import Config
 from domain.id_generator import IdGenerator
-from domain.second_formatter import SecondFormatter
+from domain.time_formatter import TimeFormatter
 from dto.subtitle import Subtitle
 
 
@@ -22,12 +22,12 @@ class SubtitleFileMaker:
             cnt: int = 1
 
             for subtitle in subtitle_list:
-                start_time: str = SecondFormatter.convert_to_hhmmss_mmm(subtitle.start)
-                end_time: str = SecondFormatter.convert_to_hhmmss_mmm(subtitle.end)
+                start_time: str = TimeFormatter.convert_to_hhmmss_mmm(subtitle.start)
+                end_time: str = TimeFormatter.convert_to_hhmmss_mmm(subtitle.end)
 
-                f.writelines(f"{cnt}")
-                f.writelines(f"{start_time} --> {end_time}")
-                f.writelines(subtitle.subtitle)
+                f.write(f"{cnt}\n")
+                f.write(f"{start_time} --> {end_time}\n")
+                f.writelines(f"{subtitle.subtitle}\n")
                 f.write("\n")
                 cnt += 1
 

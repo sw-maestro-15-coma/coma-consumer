@@ -1,6 +1,6 @@
 import os
 
-from domain.second_formatter import SecondFormatter
+from domain.time_formatter import TimeFormatter
 from domain.shorts_processor import ShortsProcessor
 from domain.shorts_repository import ShortsRepository
 from domain.shorts_thumbnail_maker import ShortsThumbnailMaker
@@ -29,12 +29,15 @@ class ShortsService:
         output_path: str = self.__shorts_processor.execute(s3_url=message.video_s3_url,
                                                            text_path=text_path,
                                                            subtitle_path=subtitle_path,
-                                                           start=SecondFormatter.convert_to_hhmmss(message.start_time),
-                                                           end=SecondFormatter.convert_to_hhmmss(message.end_time))
+                                                           start=TimeFormatter.convert_to_hhmmss(message.start_time),
+                                                           end=TimeFormatter.convert_to_hhmmss(message.end_time))
         thumbnail_path: str = self.__shorts_thumbnail_maker.execute(shorts_path=output_path)
 
         shorts_link: str = self.__shorts_repository.post_shorts(output_path=output_path)
         thumbnail_link: str = self.__shorts_repository.post_thumbnail(thumbnail_path=thumbnail_path)
+
+        with open(subtitle_path) as f:
+            print(f.readlines())
 
         self.__remove_all_temp_files([text_path, output_path, thumbnail_path, subtitle_path])
 

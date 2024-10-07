@@ -4,6 +4,7 @@ COPY . /app
 RUN mkdir output
 RUN mkdir text
 RUN mkdir thumbnail
+RUN mkdir subtitle
 
 RUN apt update && apt install -y locales && apt clean
 RUN locale-gen ko_KR.UTF-8

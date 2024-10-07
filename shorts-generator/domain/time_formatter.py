@@ -1,5 +1,5 @@
 
-class SecondFormatter:
+class TimeFormatter:
     @classmethod
     def convert_to_hhmmss(cls, second: int) -> str:
         hours: int = second // 3600

@@ -24,6 +24,9 @@ class FfmpegShortsProcessor(ShortsProcessor):
                                                         subtitle_path=subtitle_path),
                                 capture_output=True)
 
+        print(result.stdout)
+        print(result.stderr)
+
         if result.returncode != 0:
             raise RuntimeError("shorts 생성에 실패했습니다 : 에러 코드 - " + f"{result.returncode}")
 
