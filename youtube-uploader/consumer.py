@@ -7,6 +7,7 @@ from pika.spec import Basic, BasicProperties
 
 from main import upload_to_youtube
 from result_sender import send_result
+from shorts_downloader import get_file_from_url
 
 __QUEUE_IP = "54.180.140.202"
 __QUEUE_NAME = "youtube-upload"
@@ -26,7 +27,7 @@ def callback(ch: Channel,
         upload_to_youtube(access_token=access_token,
                           title=title,
                           description=description,
-                          file_path=get_shorts_file_path(shorts_url))
+                          file_path=get_file_from_url(shorts_url))
     except Exception as e:
         send_result("fail", e)
     else:
@@ -44,7 +45,3 @@ def start_consume() -> None:
     channel.basic_consume(queue=__QUEUE_NAME, on_message_callback=callback, auto_ack=False)
 
     channel.start_consuming()
-
-
-def get_shorts_file_path(shorts_url: str) -> str:
-    return ""
