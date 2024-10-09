@@ -11,7 +11,7 @@ class Subtitle:
 
 @dataclass
 class SubtitleResult:
-    subtitles: Subtitle
+    subtitles: list[Subtitle]
 
 
 class SubtitleGenerator:
