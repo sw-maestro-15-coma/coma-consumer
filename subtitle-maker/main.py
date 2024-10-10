@@ -16,10 +16,9 @@ def healthcheck():
 
 
 @app.get("/generate-subtitles", summary="테스트를 위한 api")
-def generate_subtitles_endpoint(s3_url: str):
-    audio_path = convert_audio(1, "/Users/octoping/Documents/youthcon23-2-handson.mp4")
-    subtitle_generator.generate_subtitle(audio_path)
-    # return logic(1, s3_url)
+def generate_subtitles_endpoint(video_id: int, s3_url: str):
+    subtitles = logic(video_id, s3_url)
+    return subtitles
 
 
 def logic(video_id: int, s3_url: str):
@@ -47,9 +46,6 @@ def logic(video_id: int, s3_url: str):
 
 
 if __name__ == "__main__":
-    # audio_path = convert_audio(1, "/Users/octoping/Documents/youthcon23-2-handson.mp4")
-    audio_path = f"/Users/octoping/Documents/audio/1.mp3"
-    subtitle_generator.generate_subtitle(audio_path)
     # consumer_thread = Thread(target=start_rabbitmq_consumer)
     # consumer_thread.start()
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
