@@ -22,7 +22,7 @@ class Config:
 
     @staticmethod
     def queue_name() -> str:
-        return "shorts-process"
+        return "shorts-generate"
 
     @staticmethod
     def font_path() -> str:
