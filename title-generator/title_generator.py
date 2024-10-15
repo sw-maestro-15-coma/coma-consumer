@@ -28,6 +28,7 @@ def create_shorts_title_gpt(subscription):
                                                       timeout=10.0)
     except Exception as e:
         raise RuntimeError(e, "chat gpt api에서 오류가 발생했습니다")
+
     answer = response.choices[0].message.content
 
     if not answer:
