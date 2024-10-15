@@ -12,11 +12,11 @@ class SimpleShortsResultSender(ShortsResultSender):
     def send_success(self, shorts_response_message: ShortsResponseMessage) -> None:
         headers = {'Content-Type': 'application/json; charset;utf-8'}
         data = {
-            'shortsId': shorts_response_message.shorts_id,
-            'videoId': shorts_response_message.video_id,
-            'link': shorts_response_message.link
+            "shortsId": shorts_response_message.shortsId,
+            "s3Url": shorts_response_message.s3Url,
+            "thumbnailUrl": shorts_response_message.thumbnailUrl
         }
-        requests.post(self.__API_SERVER_URL + "shorts", data=json.dumps(data), headers=headers)
+        requests.post(self.__API_SERVER_URL + "/shorts", data=json.dumps(data), headers=headers)
 
     def send_fail(self, message: str, shorts_id: int) -> None:
         headers = {'Content-Type': 'application/json; charset=utf-8'}
@@ -24,4 +24,4 @@ class SimpleShortsResultSender(ShortsResultSender):
             "shortsId": shorts_id,
             "message": message
         }
-        requests.post(self.__API_SERVER_URL + "fail", data=json.dumps(data), headers=headers)
+        requests.post(self.__API_SERVER_URL + "/fail", data=json.dumps(data), headers=headers)
