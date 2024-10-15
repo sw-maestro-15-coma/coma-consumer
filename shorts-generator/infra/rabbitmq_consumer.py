@@ -30,12 +30,12 @@ class RabbitMQConsumer:
             for key, value in data.items():
                 logging.info(f"[shorts_processor] {key}: {value}")
 
-            message = ShortsRequestMessage(video_id=data['videoId'],
-                                           video_s3_url=['videoS3Url'],
-                                           shorts_id=data['shortsId'],
+            message = ShortsRequestMessage(shorts_id=data['shortsId'],
+                                           video_s3_url=data['videoS3Url'],
                                            top_title=data['topTitle'],
                                            start_time=data['startTime'],
-                                           end_time=data['endTime'])
+                                           end_time=data['endTime'],
+                                           subtitle_list=data['subtitleList'])
 
             try:
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)

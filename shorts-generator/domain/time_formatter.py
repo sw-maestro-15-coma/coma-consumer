@@ -3,7 +3,7 @@ class TimeFormatter:
     @classmethod
     def convert_to_hhmmss(cls, second: int) -> str:
         hours: int = second // 3600
-        minutes: int = second // 60
+        minutes: int = second % 3600 // 60
         seconds: int = second % 60
 
         hh: str = cls.__number_to_str(hours)
