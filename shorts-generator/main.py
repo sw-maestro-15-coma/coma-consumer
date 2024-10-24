@@ -33,4 +33,4 @@ def test_start():
     logger.info(f"thumbnail link : {response.thumbnailUrl}")
 
 if __name__ == '__main__':
-    test_start()
+    start()
