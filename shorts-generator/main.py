@@ -1,5 +1,7 @@
 import logging
 
+from fastapi import FastAPI
+
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.subtitle import Subtitle
 from object_factory import ObjectFactory
@@ -31,6 +33,13 @@ def test_start():
 
     logger.info(f"shorts link: {response.s3Url}")
     logger.info(f"thumbnail link : {response.thumbnailUrl}")
+
+
+app = FastAPI()
+
+@app.get("/healthcheck")
+def health_check():
+    return {"message": "ok"}
 
 if __name__ == '__main__':
     start()
