@@ -23,21 +23,21 @@ class RabbitMQConsumer:
         channel.queue_declare(queue=Config.queue_name())
 
         def callback(ch: BlockingChannel, method, properties, body):
-            data: dict = json.loads(body.decode('utf-8'))
+            try:
+                data: dict = json.loads(body.decode('utf-8'))
 
-            logging.info("메시지 수신")
+                logging.info("메시지 수신")
 
-            for key, value in data.items():
-                logging.info(f"[shorts_processor] {key}: {value}")
+                for key, value in data.items():
+                    logging.info(f"[shorts_processor] {key}: {value}")
 
-            message = ShortsRequestMessage(shorts_id=data['shortsId'],
+                message = ShortsRequestMessage(shorts_id=data['shortsId'],
                                            video_s3_url=data['videoS3Url'],
                                            top_title=data['topTitle'],
                                            start_time=data['startTime'],
                                            end_time=data['endTime'],
                                            subtitle_list=data['subtitleList'])
 
-            try:
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)
             except Exception as e:
                 logging.error("shorts 생성 실패")
