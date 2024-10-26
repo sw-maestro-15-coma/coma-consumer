@@ -74,6 +74,7 @@ def start():
         except Exception as e:
             logging.error("shorts 생성 실패")
             print(e)
+            logging.error(e)
             send_fail("쇼츠 생성에 실패했습니다", shorts_id=999) #shorts_id=data['shortsId'])
             # raise e
         else:
