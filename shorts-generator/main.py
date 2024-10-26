@@ -1,5 +1,7 @@
 import logging
+from threading import Thread
 
+import uvicorn
 from fastapi import FastAPI
 
 from dto.shorts_request_message import ShortsRequestMessage
@@ -42,4 +44,6 @@ def health_check():
     return {"message": "ok"}
 
 if __name__ == '__main__':
-    start()
+    consumer_thread = Thread(target=start)
+    consumer_thread.start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
