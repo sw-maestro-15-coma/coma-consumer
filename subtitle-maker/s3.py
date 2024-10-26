@@ -1,3 +1,5 @@
+import os
+
 import boto3
 from dataclasses import dataclass
 
@@ -12,15 +14,19 @@ __s3 = boto3.client(
 
 def download_video(video_id: int, s3_url: str) -> str:
     parse_result = S3UrlParser(s3_url)
-    video_path = f"/Users/octoping/{video_id}.{parse_result.extension}"
+    video_path = f"{os.environ.get("video_path")}/{video_id}.{parse_result.extension}"
 
     __s3.download_file(
-        bucket=parse_result.bucket_name,
-        key=parse_result.object_key,
-        filename=video_path
+        parse_result.bucket_name,
+        parse_result.object_key,
+        video_path
     )
 
     return video_path
+
+
+def delete_video(video_path: str):
+    os.remove(video_path)
 
 
 class S3UrlParser:

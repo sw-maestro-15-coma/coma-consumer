@@ -1,3 +1,5 @@
+import os
+
 from subtitle import SubtitleGenerator, SubtitleResult, Subtitle
 import whisperx
 
@@ -18,7 +20,7 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
         return SubtitleResult(subtitles)
 
     def __transcribe_with_original_whisper(self, audio_path: str):
-        model_dir = f"/Users/octoping/Documents/audio"
+        model_dir = os.environ.get("model_path")
 
         model = whisperx.load_model(
             whisper_arch=self.__whisper_arch,

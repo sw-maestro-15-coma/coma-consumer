@@ -4,9 +4,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Subtitle:
-    start_time: int
-    end_time: int
-    text: str
+    start: int
+    end: int
+    subtitle: str
 
 
 @dataclass
