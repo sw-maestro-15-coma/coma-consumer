@@ -3,6 +3,7 @@ from openai.types.chat import ChatCompletion
 
 from utils import hhmmss_to_seconds
 
+
 __OPENAI_API_KEY = "sk-svcacct-2O4EB8Ztb9YKx764tSr8T3BlbkFJ5dr1henfflQ83g5R5YfJ"
 
 

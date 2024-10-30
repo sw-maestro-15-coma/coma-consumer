@@ -35,5 +35,12 @@ def generate_edit_point(request_body: RequestDto):
     }
 
 
+@app.get("/healthcheck")
+def health_check():
+    return {
+        "message": "ok"
+    }
+
+
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000)
