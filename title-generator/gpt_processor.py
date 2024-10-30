@@ -1,7 +1,10 @@
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 
+from utils import hhmmss_to_seconds
+
 __OPENAI_API_KEY = "sk-svcacct-2O4EB8Ztb9YKx764tSr8T3BlbkFJ5dr1henfflQ83g5R5YfJ"
+
 
 def create_shorts_title_gpt(subscription: str) -> str:
     client = OpenAI(
@@ -36,10 +39,12 @@ def create_shorts_title_gpt(subscription: str) -> str:
 
     return answer
 
+
 class EditPoint:
     def __init__(self, start: int, end: int) -> None:
         self.start = start
         self.end = end
+
 
 def create_shorts_edit_point(subscription: str) -> EditPoint:
     client = OpenAI(
@@ -48,8 +53,8 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
 
     model = "gpt-4o-mini"
     query = ("Find the funniest point in the subscription."
-             "Result Format is HH:MM:SS ~ HH:MM:SS."
-             "Don't mention any other sentence. Just show me HH:MM:SS ~ HH:MM:SS."
+             "Result Format is HH:MM:SS~HH:MM:SS."
+             "Don't mention any other sentence. Just show me HH:MM:SS~HH:MM:SS."
              "And minimum interval is 30 seconds, and Maximum interval is 1 Minutes."
              "The following shows the whole subscription:"
              f"{subscription}")
@@ -72,9 +77,12 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
 
     answer = response.choices[0].message.content
 
-    print(answer)
+    answers = answer.split('~')
+    start: int = hhmmss_to_seconds(answers[0])
+    end: int = hhmmss_to_seconds(answers[1])
 
-    return EditPoint(start=0, end=1)
+    return EditPoint(start=start, end=end)
+
 
 def test_start():
     subscription = ""
