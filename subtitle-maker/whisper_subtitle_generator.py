@@ -6,7 +6,7 @@ import whisperx
 
 class WhisperXSubtitleGenerator(SubtitleGenerator):
     __device = "cpu"
-    __whisper_arch = "large-v2"
+    __whisper_arch = "small"
     __batch_size = 16  # reduce if low on GPU mem
     __compute_type = "int8"  # change to "int8" if low on GPU mem (may reduce accuracy)
 
