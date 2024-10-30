@@ -2,10 +2,16 @@ from fastapi import FastAPI
 from threading import Thread
 import uvicorn
 import pika
+import logging
+import requests
+from pika.adapters.blocking_connection import BlockingConnection, BlockingChannel
 
+from subtitle import SubtitleResult
 from whisper_subtitle_generator import subtitle_generator
-from s3 import download_video
-from convert_audio import convert_audio
+from s3 import download_video, delete_video
+from convert_audio import convert_audio, delete_audio
+
+import json
 
 app = FastAPI()
 
@@ -16,40 +22,74 @@ def healthcheck():
 
 
 @app.get("/generate-subtitles", summary="테스트를 위한 api")
-def generate_subtitles_endpoint(s3_url: str):
-    audio_path = convert_audio(1, "/Users/octoping/Documents/youthcon23-2-handson.mp4")
-    subtitle_generator.generate_subtitle(audio_path)
-    # return logic(1, s3_url)
+def generate_subtitles_endpoint(video_id: int, s3_url: str):
+    subtitles = logic(video_id, s3_url)
+    return subtitles
 
 
-def logic(video_id: int, s3_url: str):
+def logic(video_id: int, s3_url: str) -> SubtitleResult:
     video_path = download_video(video_id, s3_url)
     audio_path = convert_audio(video_id, video_path)
+    delete_video(video_path)
 
-    return subtitle_generator.generate_subtitle(audio_path)
+    subtitle = subtitle_generator.generate_subtitle(audio_path)
+    delete_audio(audio_path)
+
+    return subtitle
 
 
-# def rabbitmq_callback(ch, method, properties, body):
-#     # 요청 처리
-#     video_s3_url = body.decode('utf-8')
-#     process_video_from_s3(video_s3_url)
-#     ch.basic_ack(delivery_tag=method.delivery_tag)
-#
-#
-# def start_rabbitmq_consumer():
-#     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-#     channel = connection.channel()
-#     channel.queue_declare(queue='video_queue')
-#
-#     channel.basic_consume(queue='video_queue', on_message_callback=rabbitmq_callback)
-#     print('메시지를 기다리는 중입니다. 종료하려면 CTRL+C를 누르세요.')
-#     channel.start_consuming()
+def send_success(videoId: int, subtitle: SubtitleResult):
+    headers = {'Content-Type': 'application/json; charset;utf-8'}
+    data = {
+        "videoId": videoId,
+        "subtitleList": subtitle.subtitles
+    }
+    requests.post("https://api.cotuber.com/api/v1/message/subtitle", data=json.dumps(data), headers=headers)
+
+
+def send_fail(message: str, shorts_id: int):
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+    data = {
+        "shortsId": shorts_id,
+        "message": message
+    }
+    requests.post("https://api.cotuber.com/api/v1/message/fail", data=json.dumps(data), headers=headers)
+
+
+def start():
+    connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202"))
+    channel: BlockingChannel = connection.channel()
+    channel.queue_declare(queue='video-subtitle-generate')
+
+    def callback(ch: BlockingChannel, method, properties, body):
+        data: dict = json.loads(body.decode('utf-8'))
+
+        logging.info("메시지 수신")
+
+        for key, value in data.items():
+            print(f"[subtitle-generate] {key}: {value}")
+
+        try:
+            response: SubtitleResult = logic(data['videoId'], data['s3Url'])
+        except Exception as e:
+            logging.error("shorts 생성 실패")
+            print(e)
+            logging.error(e)
+            send_fail("쇼츠 생성에 실패했습니다", shorts_id=999) #shorts_id=data['shortsId'])
+            # raise e
+        else:
+            logging.info("shorts 생성 성공")
+            send_success(data['videoId'], response)
+        finally:
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(queue='video-subtitle-generate', on_message_callback=callback, auto_ack=False)
+
+    channel.start_consuming()
 
 
 if __name__ == "__main__":
-    # audio_path = convert_audio(1, "/Users/octoping/Documents/youthcon23-2-handson.mp4")
-    audio_path = f"/Users/octoping/Documents/audio/1.mp3"
-    subtitle_generator.generate_subtitle(audio_path)
-    # consumer_thread = Thread(target=start_rabbitmq_consumer)
-    # consumer_thread.start()
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
+    consumer_thread = Thread(target=start)
+    consumer_thread.start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)

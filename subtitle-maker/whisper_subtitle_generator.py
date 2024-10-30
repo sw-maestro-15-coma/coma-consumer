@@ -1,42 +1,60 @@
-from subtitle import SubtitleGenerator, SubtitleResult
+import os
+
+from subtitle import SubtitleGenerator, SubtitleResult, Subtitle
 import whisperx
 
 
 class WhisperXSubtitleGenerator(SubtitleGenerator):
-    __device = "cuda"
-    __whisper_arch = "large-v2"
+    __device = "cpu"
+    __whisper_arch = "small"
     __batch_size = 16  # reduce if low on GPU mem
-    __compute_type = "float16"  # change to "int8" if low on GPU mem (may reduce accuracy)
+    __compute_type = "int8"  # change to "int8" if low on GPU mem (may reduce accuracy)
 
     def generate_subtitle(self, audio_path: str) -> SubtitleResult:
-        model, audio, result = self.__transcribe_with_original_whisper(audio_path)
+        audio, result = self.__transcribe_with_original_whisper(audio_path)
+        # result = self.__align_whisper_output(audio, result) # 단어 별 스탬프가 필요하면 사용
 
-        result = self.__align_whisper_output(audio, result)
+        segments = result["segments"]
+        subtitles: list[Subtitle] = list(map(lambda x: Subtitle(x["start"], x["end"], x["text"]), segments))
 
-        # 3. Assign speaker labels
-        diarize_model = whisperx.DiarizationPipeline(use_auth_token="YOUR_HF_TOKEN", device=self.__device)
-
-        # add min/max number of speakers if known
-        diarize_segments = diarize_model(audio)
-        # diarize_model(audio, min_speakers=min_speakers, max_speakers=max_speakers)
-
-        result = whisperx.assign_word_speakers(diarize_segments, result)
-        print(diarize_segments)
-        print(result["segments"])  # segments are now assigned speaker IDs
+        return SubtitleResult(subtitles)
 
     def __transcribe_with_original_whisper(self, audio_path: str):
-        model = whisperx.load_model(self.__whisper_arch, self.__device, compute_type=self.__compute_type)
+        model_dir = os.environ.get("model_path")
+
+        model = whisperx.load_model(
+            whisper_arch=self.__whisper_arch,
+            device=self.__device,
+            compute_type=self.__compute_type,
+            download_root=model_dir
+        )
+
         audio = whisperx.load_audio(audio_path)
-        result = model.transcribe(audio, batch_size=self.__batch_size)
+
+        result = model.transcribe(
+            audio=audio,
+            language='ko',
+            batch_size=self.__batch_size
+        )
 
         print(result["segments"])  # before alignment
-        return model, audio, result
+        return audio, result
 
+    # 단어 별 스탬프가 필요하면 사용
     def __align_whisper_output(self, audio, result):
         model_a, metadata = whisperx.load_align_model(language_code=result["language"], device=self.__device)
-        result = whisperx.align(result["segments"], model_a, metadata, audio, self.__device, return_char_alignments=False)
 
-        print(result["segments"])  # after alignment
+        result = whisperx.align(
+            transcript=result["segments"],
+            model=model_a,
+            align_model_metadata=metadata,
+            audio=audio,
+            device=self.__device,
+            return_char_alignments=False
+        )
+
+        # print(result["segments"])  # after alignment
         return result
+
 
 subtitle_generator: SubtitleGenerator = WhisperXSubtitleGenerator()
