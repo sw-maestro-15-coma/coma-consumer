@@ -85,6 +85,7 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
     return EditPoint(start=start, end=end)
 
 
+
 def test_start():
     subscription = ""
     with open('test_subscription.txt', 'r') as file:
