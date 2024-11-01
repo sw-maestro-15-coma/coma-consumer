@@ -29,7 +29,7 @@ def callback(ch: Channel,
         edit_point: EditPoint = create_shorts_edit_point(subscription)
 
     except Exception as e:
-        send_fail(e)
+        send_fail(str(e))
     else:
         send_success(draft_id=draft_id, title=title, edit_point=edit_point)
     finally:
