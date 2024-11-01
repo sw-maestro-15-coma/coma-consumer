@@ -19,7 +19,7 @@ jobs:
           filters: |
             files:
               - 'title-generator/**'
-              - '.github/workflows/ai-processor.yml'
+              - '.github/workflows/ci-ai-processor.yml'
     outputs:
       files: ${{ steps.compute_diff.outputs.files }}
 
