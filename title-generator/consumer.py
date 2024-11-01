@@ -1,4 +1,5 @@
 import json
+import logging
 
 import pika
 from pika.channel import Channel
@@ -14,6 +15,10 @@ from utils import make_subscription
 __QUEUE_IP = "54.180.140.202"
 __QUEUE_NAME = "ai-process"
 
+logging.basicConfig(level=logging.INFO)
+__logger = logging.getLogger("consumer")
+__logger.setLevel(logging.INFO)
+
 
 def callback(ch: Channel,
              method: Basic.Deliver,
@@ -24,12 +29,18 @@ def callback(ch: Channel,
         draft_id: int = data['draftId']
         subtitle_list: list[Subtitle] = data['subtitleList']
 
+        __logger.info(f"draftId : {draft_id}")
+
         subscription: str = make_subscription(subtitle_list)
         title: str = create_shorts_title_gpt(subscription)
         edit_point: EditPoint = create_shorts_edit_point(subscription)
 
+        __logger.info("finished")
+        __logger.info(f"title: {title} / start: {edit_point.start} / end: {edit_point.end}")
+
     except Exception as e:
-        send_fail(e)
+        __logger.error(e)
+        send_fail(str(e))
     else:
         send_success(draft_id=draft_id, title=title, edit_point=edit_point)
     finally:
