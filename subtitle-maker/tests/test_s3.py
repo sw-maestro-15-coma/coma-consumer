@@ -6,14 +6,14 @@ class MyTestCase(TestCase):
     def test_parse(self):
         """s3urlparser를 생성하면 url의 요소들을 파싱할 수 있어야 한다"""
         # given
-        s3_url = "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com/origin/599903428704431693.webm"
+        s3_url = "s3://video-process-bucket/origin/Gzs1qNmTcYY.webm"
 
         # when
         result = S3UrlParser(s3_url)
 
         # then
-        self.assertEqual(result.bucket_name, "video-process-test-bucket")
-        self.assertEqual(result.object_key, "origin/599903428704431693.webm")
+        self.assertEqual(result.bucket_name, "video-process-bucket")
+        self.assertEqual(result.object_key, "origin/Gzs1qNmTcYY.webm")
         self.assertEqual(result.extension, "webm")
 
     def test_parse_invalid_url(self):
