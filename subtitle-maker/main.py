@@ -46,7 +46,7 @@ def send_success(videoId: int, subtitle: SubtitleResult):
     headers = {'Content-Type': 'application/json; charset;utf-8'}
     data = {
         "videoId": videoId,
-        "subtitleList": subtitle.subtitles
+        "subtitleList": list(map(lambda x: x.__dict__, subtitle.subtitles))
     }
     requests.post("https://api.cotuber.com/api/v1/message/subtitle", data=json.dumps(data), headers=headers)
 
