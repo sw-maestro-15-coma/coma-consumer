@@ -15,6 +15,10 @@ import json
 
 app = FastAPI()
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("main")
+logger.setLevel(logging.INFO)
+
 
 @app.get("/healthcheck")
 def healthcheck():
