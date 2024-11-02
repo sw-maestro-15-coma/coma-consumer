@@ -37,11 +37,11 @@ class S3UrlParser:
     def __init__(self, s3_url: str):
         self.__validate_url(s3_url)
 
-        parts = s3_url.replace("https://", "").split('/')
-        self.bucket_name = parts[0].split(".s3.ap-northeast-2")[0]
+        parts = s3_url.replace("s3://", "").split('/')
+        self.bucket_name = parts[0]
         self.object_key = '/'.join(parts[1:])
         self.extension = self.object_key.split('/')[-1].split('.')[-1]
 
     def __validate_url(self, s3_url: str):
-        if ".s3.ap-northeast-2" not in s3_url:
+        if "s3://" not in s3_url:
             raise ValueError("잘못된 S3 URL입니다.")
