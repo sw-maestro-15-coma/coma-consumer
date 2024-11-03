@@ -1,12 +1,8 @@
 from pydantic import BaseModel
 
 
-class Subtitle(BaseModel):
-    start: int
-    end: int
-    subtitle: str
-
-
-class RequestDto(BaseModel):
-    draftId: int
-    subtitleList: list[Subtitle]
+class Subtitle:
+    def __init__(self, start: int, end: int, subtitle: str):
+        self.start = start
+        self.end = end
+        self.subtitle = subtitle
