@@ -27,9 +27,18 @@ def callback(ch: Channel,
     try:
         data: dict = json.loads(body.decode('utf-8'))
         draft_id: int = data['draftId']
-        subtitle_list: list[Subtitle] = data['subtitleList']
+        input_list = data['subtitleList']
+
+        subtitle_list: list[Subtitle] = []
+
+        for inp in input_list:
+            start: int = inp['start']
+            end: int = inp['end']
+            subtitle: str = inp['subtitle']
+            subtitle_list.append(Subtitle(start, end, subtitle))
 
         __logger.info(f"draftId : {draft_id}")
+        __logger.info(f"subtitleList : {subtitle_list}")
 
         subscription: str = make_subscription(subtitle_list)
         title: str = create_shorts_title_gpt(subscription)
