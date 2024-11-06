@@ -14,7 +14,25 @@ const parseS3Url = (shortsS3Url: string): {bucketName: string, key: string, file
     };
 }
 
-export const download = async (shortsS3Url: string): Promise<string | undefined> => {
+export const download = async ({shortsS3Url, thumbnailUrl}: {shortsS3Url: string, thumbnailUrl: string}):
+    Promise<{shortsPath: string, thumbnailPath: string}> => {
+    const promises: Promise<string | undefined>[] = [downloadFromS3(shortsS3Url), downloadFromS3(thumbnailUrl)];
+
+    const results: (string | undefined)[] = await Promise.all(promises);
+
+    if (results === undefined) {
+        throw new Error("Shorts 다운로드에 실패했습니다");
+    }
+
+    const filteredResult: string[] = results.filter((data) => data !== undefined);
+
+    return {
+        shortsPath: filteredResult[0],
+        thumbnailPath: filteredResult[1]
+    };
+};
+
+const downloadFromS3 = async (url: string): Promise<string | undefined> => {
     const client = new S3Client({
         region: "ap-northeast-2",
         credentials: {
@@ -23,7 +41,7 @@ export const download = async (shortsS3Url: string): Promise<string | undefined>
         },
     });
 
-    const {bucketName, key, fileName} = parseS3Url(shortsS3Url)
+    const {bucketName, key, fileName} = parseS3Url(url)
 
     try {
         const response: GetObjectCommandOutput = await client.send(
