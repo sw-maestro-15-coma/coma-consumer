@@ -1,0 +1,23 @@
+{
+  "name": "instagram-uploader-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.685.0",
+    "amqplib": "^0.10.4",
+    "express": "^4.21.1",
+    "instagram-publisher": "^2.3.0",
+    "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}
