@@ -13,7 +13,7 @@ const deleteShorts = (fileName: string): void => {
     })
 };
 
-const callback = (msg: Message | null) => {
+const consume = async (msg:Message | null): Promise<void> => {
     if (msg === null) {
         throw new Error("msg is null");
     }
@@ -28,7 +28,7 @@ const callback = (msg: Message | null) => {
     const publishType: string = req.publishType;
     const shortsS3Url: string = req.shortsS3Url;
 
-    console.log(`email: ${email}, password: ${password}, title: ${title}, description: ${description}, publishType: ${publishType}, shortsS3Url: ${shortsS3Url}`);
+    console.log(`email: ${email}, title: ${title}, description: ${description}, publishType: ${publishType}, shortsS3Url: ${shortsS3Url}`);
 
     download(shortsS3Url)
         .then((fileName: string | undefined) => {
@@ -46,8 +46,6 @@ const callback = (msg: Message | null) => {
                 publishType: publishType
             }).then(() => {
                 deleteShorts(fileName);
-            }).catch((err) => {
-                console.error("shorts upload에 실패했습니다")
             })
         });
 };
@@ -69,7 +67,17 @@ export const startConsume = async (): Promise<void> => {
             });
             channel.prefetch(1);
 
-            channel.consume(queueName, callback, {noAck: true});
+            channel.consume(queueName, (msg: Message | null): void => {
+                try {
+                    consume(msg);
+                } catch (error) {
+                    console.error("youtube uploader 컨슈머 내부 오류 발생");
+                    console.error(error);
+                } finally {
+                    channel.ack(msg!);
+                }
+
+            }, {noAck: true});
         });
     });
 };
