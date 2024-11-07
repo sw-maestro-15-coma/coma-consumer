@@ -19,6 +19,7 @@ class ShortsService:
         self.__shorts_repository = shorts_repository
         self.__shorts_thumbnail_maker = shorts_thumbnail_maker
 
+
     def make_shorts(self, message: ShortsRequestMessage) -> ShortsResponseMessage:
         temp_text_file = TempTextFile()
         temp_text_file.write_to_file(self.__add_next_line_if_over_10(message.top_title))
@@ -26,7 +27,10 @@ class ShortsService:
 
         subtitle_path: str = SubtitleFileMaker.make_subtitle_file(message.subtitle_list)
 
+        input_path: str = self.__shorts_repository.download_shorts(message.video_s3_url)
+
         output_path: str = self.__shorts_processor.execute(s3_url=message.video_s3_url,
+                                                           input_path=input_path,
                                                            text_path=text_path,
                                                            subtitle_path=subtitle_path,
                                                            start=TimeFormatter.convert_to_hhmmss(message.start_time),
@@ -39,11 +43,12 @@ class ShortsService:
         with open(subtitle_path) as f:
             print(f.readlines())
 
-        self.__remove_all_temp_files([text_path, output_path, thumbnail_path, subtitle_path])
+        self.__remove_all_temp_files([text_path, output_path, thumbnail_path, subtitle_path, input_path])
 
         return ShortsResponseMessage(shorts_id=message.shorts_id,
                                      shorts_link=shorts_link,
                                      thumbnail_link=thumbnail_link)
+
 
     @staticmethod
     def __remove_all_temp_files(path_list: list[str]) -> None:
