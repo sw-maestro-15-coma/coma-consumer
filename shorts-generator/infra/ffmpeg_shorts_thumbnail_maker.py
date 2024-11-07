@@ -17,8 +17,8 @@ class FfmpegShortsThumbnailMaker(ShortsThumbnailMaker):
             raise RuntimeError("shorts 생성에 실패했습니다 : 에러 코드 - " + f"{result.returncode}")
         return output_path
 
-    @staticmethod
-    def __get_command(shorts_path: str, output_path: str) -> list[str]:
+
+    def __get_command(self, shorts_path: str, output_path: str) -> list[str]:
         return [
             'ffmpeg',
             '-i',

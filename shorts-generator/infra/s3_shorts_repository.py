@@ -1,5 +1,3 @@
-import os.path
-from typing import AnyStr, LiteralString
 from venv import logger
 
 import boto3
@@ -7,12 +5,15 @@ from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
 from config import Config
+from domain.file_system import FileSystem
 from domain.id_generator import IdGenerator
 from domain.shorts_repository import ShortsRepository
 
+
 class S3ShortsRepository(ShortsRepository):
-    def __init__(self) -> None:
+    def __init__(self, file_system: FileSystem) -> None:
         self.__s3_bucket_name = Config.s3_bucket_name()
+        self.__file_system = file_system
         self.client: BaseClient = boto3.client("s3",
                              region_name=Config.region(),
                              aws_access_key_id=Config.aws_access_key(),
@@ -33,7 +34,7 @@ class S3ShortsRepository(ShortsRepository):
 
     def post_shorts(self, output_path: str) -> str:
         try:
-            file_name: AnyStr = self.__extract_file_name(output_path)
+            file_name: str = self.__file_system.extract_file_name(output_path)
             self.client.upload_file(output_path, self.__s3_bucket_name, 'shorts/' + file_name)
 
             return Config.s3_url() + '/shorts/' + file_name
@@ -44,7 +45,7 @@ class S3ShortsRepository(ShortsRepository):
 
     def post_thumbnail(self, thumbnail_path: str) -> str:
         try:
-            file_name: AnyStr = self.__extract_file_name(thumbnail_path)
+            file_name: str = self.__file_system.extract_file_name(thumbnail_path)
             self.client.upload_file(thumbnail_path, self.__s3_bucket_name, 'thumbnail/' + file_name)
 
             return Config.s3_url() + '/thumbnail/' + file_name
@@ -52,14 +53,9 @@ class S3ShortsRepository(ShortsRepository):
             logger.error(e)
             raise
 
-    @staticmethod
-    def __extract_file_name(path: str) -> AnyStr:
-        return os.path.basename(path)
 
+    def __extract_key(self, s3_url: str) -> str:
+        split: list[str] = s3_url.replace("s3://", "").split("/")
 
-    @staticmethod
-    def __extract_key(s3_url: str) -> str:
-        splited: list[str] = s3_url.replace("s3://", "").split("/")
-
-        return f"{splited[1]}/{splited[2]}"
+        return f"{split[1]}/{split[2]}"
 

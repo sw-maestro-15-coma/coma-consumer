@@ -18,6 +18,7 @@ class SimpleShortsResultSender(ShortsResultSender):
         }
         requests.post(self.__API_SERVER_URL + "/shorts", data=json.dumps(data), headers=headers)
 
+
     def send_fail(self, message: str, shorts_id: int) -> None:
         headers = {'Content-Type': 'application/json; charset=utf-8'}
         data = {
