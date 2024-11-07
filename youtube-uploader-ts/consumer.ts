@@ -30,28 +30,29 @@ const consume = async (msg:Message | null): Promise<void> => {
 
     console.log(`email: ${email}, title: ${title}, description: ${description}, publishType: ${publishType}, shortsS3Url: ${shortsS3Url}`);
 
-    download(shortsS3Url)
-        .then((fileName: string | undefined) => {
-            if (!fileName) {
-                throw new Error("s3 download에 실패했습니다");
-            }
+    const shortsPath = await download(shortsS3Url);
 
-            uploadShorts({
-                fileName: fileName,
-                email: email,
-                recoveryEmail: recoveryEmail,
-                password: password,
-                title: title,
-                description: description + " #Shorts",
-                publishType: publishType
-            }).then(() => {
-                deleteShorts(fileName);
-            })
-        });
+    if (shortsPath === undefined) {
+        throw new Error("shorts 다운로드에 실패했습니다");
+    }
+
+    await uploadShorts({
+        fileName: shortsPath,
+        email: email,
+        recoveryEmail: recoveryEmail,
+        password: password,
+        title: title,
+        description: description + " #Shorts",
+        publishType: publishType
+    });
+
+    deleteShorts(shortsPath);
 };
 
+const QUEUE_ADDR = "amqp://54.180.140.202";
+
 export const startConsume = async (): Promise<void> => {
-    amqp.connect('amqp://localhost', (err0, connection: Connection) => {
+    amqp.connect(QUEUE_ADDR, (err0, connection: Connection) => {
         if (err0) {
             throw err0;
         }
@@ -68,16 +69,18 @@ export const startConsume = async (): Promise<void> => {
             channel.prefetch(1);
 
             channel.consume(queueName, (msg: Message | null): void => {
-                try {
-                    consume(msg);
-                } catch (error) {
-                    console.error("youtube uploader 컨슈머 내부 오류 발생");
-                    console.error(error);
-                } finally {
-                    channel.ack(msg!);
-                }
 
-            }, {noAck: true});
+                consume(msg)
+                    .then(() => {
+                        channel.ack(msg!);
+                    })
+                    .catch((err) => {
+                        console.error("youtube uploader 컨슈머 내부 오류");
+                        console.error(err);
+                        channel.ack(msg!);
+                    });
+
+            }, {noAck: false});
         });
     });
 };

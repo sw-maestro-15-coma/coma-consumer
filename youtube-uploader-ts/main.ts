@@ -13,5 +13,3 @@ app.get("/healthcheck", (req, res) => {
 app.listen(port, () => {
    console.log(`listening start on port ${port}`);
 });
-
-export default app;
