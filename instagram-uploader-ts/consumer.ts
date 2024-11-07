@@ -19,7 +19,7 @@ const deleteTempFiles = (shortsPath: string, thumbnailPath: string): void => {
     });
 };
 
-const consume = (msg:Message | null): void => {
+const consume = async (msg:Message | null): Promise<void> => {
     if (msg === null) {
         throw new Error("msg is null");
     }
@@ -32,22 +32,25 @@ const consume = (msg:Message | null): void => {
     const thumbnailUrl: string = req.thumbnailUrl;
     const caption: string = req.caption;
 
-    download({shortsS3Url, thumbnailUrl})
-        .then((paths: {shortsPath: string, thumbnailPath: string}) => {
-            uploadReels({
-                email: email,
-                password: password,
-                videoPath: paths.shortsPath,
-                thumbnailPath: paths.thumbnailPath,
-                caption: caption
-            }).then(() => {
-                deleteTempFiles(paths.shortsPath, paths.thumbnailPath);
-            })
-        });
+    const {shortsPath, thumbnailPath} = await download({shortsS3Url, thumbnailUrl});
+
+    console.log(`email: ${email}, shortsPath: ${shortsPath}, thumbnailPath: ${thumbnailUrl}, caption: ${caption}`);
+
+    await uploadReels({
+        email: email,
+        password: password,
+        videoPath: shortsPath,
+        thumbnailPath: thumbnailPath,
+        caption: caption
+    });
+
+    deleteTempFiles(shortsPath, thumbnailPath);
 };
 
+const QUEUE_ADDR = "amqp://54.180.140.202"
+
 export const startConsume = async (): Promise<void> => {
-    amqp.connect('amqp://localhost', (err0, connection: Connection) => {
+    amqp.connect(QUEUE_ADDR, (err0, connection: Connection) => {
         if (err0) {
             throw err0;
         }
@@ -64,15 +67,16 @@ export const startConsume = async (): Promise<void> => {
             channel.prefetch(1);
 
             channel.consume(queueName, (msg: Message | null) => {
-                try {
-                    consume(msg);
-                } catch (error) {
-                    console.error("instagram uploader 컨슈머 내부 오류 발생");
-                    console.error(error);
-                } finally {
-                    channel.ack(msg!);
-                }
-            }, {noAck: true});
+                consume(msg)
+                    .then(() => {
+                        channel.ack(msg!);
+                    })
+                    .catch((err) => {
+                        console.error("instagram uploader 컨슈머 내부 오류 발생");
+                        console.error(err);
+                        channel.ack(msg!);
+                    });
+            }, {noAck: false});
         });
     });
 };
