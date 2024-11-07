@@ -54,7 +54,7 @@ class FfmpegShortsProcessor(ShortsProcessor):
         ]
 
     def __get_video_filter(self, text_path: str, subtitle_path: str) -> str:
-        return ("scale=1080:1920:force_original_aspect_ratio=decrease,"
+        return ("scale=1080:1920:force_original_aspect_ratio=decrease,setsar=1:1,setdar=9:16"
                 "pad=1080:1920:(ow-iw)/2:(oh-ih)/2," +
                 f"drawtext=textfile={text_path}:fontfile={self.__FONT_PATH}" 
                 ":fontcolor=white:fontsize=100:x=(w-text_w)/2:y=200,"
