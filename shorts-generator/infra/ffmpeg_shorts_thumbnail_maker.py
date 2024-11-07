@@ -8,7 +8,7 @@ class FfmpegShortsThumbnailMaker(ShortsThumbnailMaker):
     def execute(self, shorts_path: str) -> str:
         uuid: int = IdGenerator.make_id()
 
-        output_path: str = Config.thumbnail_path() + f"/{uuid}.png"
+        output_path: str = Config.thumbnail_path() + f"/{uuid}.jpg"
 
         result = subprocess.run(args=self.__get_command(shorts_path=shorts_path, output_path=output_path),
                                     capture_output=True)

@@ -18,7 +18,7 @@ class Config:
 
     @staticmethod
     def s3_bucket_name() -> str:
-        return "video-process-test-bucket"
+        return "video-process-bucket"
 
     @staticmethod
     def queue_name() -> str:
@@ -30,7 +30,7 @@ class Config:
 
     @staticmethod
     def s3_url() -> str:
-        return "https://video-process-test-bucket.s3.ap-northeast-2.amazonaws.com"
+        return "s3://video-process-bucket"
 
     @staticmethod
     def text_path() -> str:

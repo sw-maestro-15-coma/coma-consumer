@@ -10,7 +10,7 @@ class SimpleShortsResultSender(ShortsResultSender):
     __API_SERVER_URL = Config.api_server_url()
 
     def send_success(self, shorts_response_message: ShortsResponseMessage) -> None:
-        headers = {'Content-Type': 'application/json; charset;utf-8'}
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
         data = {
             "shortsId": shorts_response_message.shortsId,
             "s3Url": shorts_response_message.s3Url,
