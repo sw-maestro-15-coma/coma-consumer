@@ -21,7 +21,7 @@ class RabbitMQConsumer:
 
 
     def start(self) -> None:
-        connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202"))
+        connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=60))
         channel: BlockingChannel = connection.channel()
         channel.queue_declare(queue=Config.queue_name())
 
@@ -56,6 +56,7 @@ class RabbitMQConsumer:
             else:
                 logging.info("shorts 생성 성공")
                 self.shorts_result_sender.send_success(response)
+
 
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=True)
