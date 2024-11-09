@@ -6,6 +6,7 @@ import logging
 import requests
 from pika.adapters.blocking_connection import BlockingConnection, BlockingChannel
 
+from rearrange_subtitle import SubtitleReconstructor
 from subtitle import SubtitleResult
 from whisper_subtitle_generator import subtitle_generator
 from s3 import download_video, delete_video
@@ -39,7 +40,9 @@ def logic(video_id: int, s3_url: str) -> SubtitleResult:
     subtitle = subtitle_generator.generate_subtitle(audio_path)
     delete_audio(audio_path)
 
-    return subtitle
+    rearrange_subtitle = SubtitleReconstructor().reconstruct(subtitle.subtitles)
+
+    return rearrange_subtitle
 
 
 def send_success(videoId: int, subtitle: SubtitleResult):

@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Subtitle:
-    start: int
-    end: int
+    start: float
+    end: float
     subtitle: str
 
 

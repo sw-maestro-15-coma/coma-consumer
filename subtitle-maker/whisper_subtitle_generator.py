@@ -12,10 +12,11 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
 
     def generate_subtitle(self, audio_path: str) -> SubtitleResult:
         audio, result = self.__transcribe_with_original_whisper(audio_path)
-        # result = self.__align_whisper_output(audio, result) # 단어 별 스탬프가 필요하면 사용
+        result = self.__align_whisper_output(audio, result) # 단어 별 스탬프가 필요하면 사용
 
-        segments = result["segments"]
-        subtitles: list[Subtitle] = list(map(lambda x: Subtitle(x["start"], x["end"], x["text"]), segments))
+        words = sum(list(map(lambda x: x["words"], result["segments"])), [])
+
+        subtitles: list[Subtitle] = list(map(lambda x: Subtitle(x["start"], x["end"], x["word"]), words))
 
         return SubtitleResult(subtitles)
 
