@@ -21,6 +21,7 @@ COPY s3.py /app/s3.py
 COPY subtitle.py /app/subtitle.py
 COPY whisper_subtitle_generator.py /app/whisper_subtitle_generator.py
 COPY convert_audio.py /app/convert_audio.py
+COPY rearrange_subtitle.py /app/rearrange_subtitle.py
 
 RUN pip install --no-cache-dir -r requirements.txt
 
