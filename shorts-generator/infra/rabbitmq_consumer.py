@@ -9,6 +9,9 @@ from config import Config
 from domain.shorts_result_sender import ShortsResultSender
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
+from dto.subtitle import Subtitle
+from main import start
+
 
 class RabbitMQConsumer:
     def __init__(self,
@@ -32,12 +35,18 @@ class RabbitMQConsumer:
                 for key, value in data.items():
                     logging.info(f"[shorts_processor] {key}: {value}")
 
+                subtitle_list: list[Subtitle] = []
+
+                for sub in data['subtitleList']:
+                    temp = Subtitle(int(sub['start']), int(sub['end']), sub['subtitle'])
+                    subtitle_list.append(temp)
+
                 message = ShortsRequestMessage(shorts_id=data['shortsId'],
                                            video_s3_url=data['videoS3Url'],
                                            top_title=data['topTitle'],
                                            start_time=data['startTime'],
                                            end_time=data['endTime'],
-                                           subtitle_list=data['subtitleList'])
+                                           subtitle_list=subtitle_list)
 
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)
             except Exception as e:
