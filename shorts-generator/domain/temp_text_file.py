@@ -19,7 +19,8 @@ class TempTextFile:
 
     def write_to_file(self, top_title: str) -> None:
         self.__check_null()
-        self.__file_system.make_dir_if_not_exists(self.__text_file_path)
+        dir_name: str = self.__file_system.extract_dir_name(self.__text_file_path)
+        self.__file_system.make_dir_if_not_exists(dir_name)
 
         self.__file_system.write_text_to_file(self.__text_file_path, top_title)
 
