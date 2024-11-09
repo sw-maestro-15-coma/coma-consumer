@@ -18,7 +18,6 @@ class SubtitleFileMaker:
         temp_path: str = Config.subtitle_path() + f"/{uuid}.srt"
 
         dir_name: str = self.__file_system.extract_dir_name(temp_path)
-        self.__file_system.make_dir_if_not_exists(dir_name)
 
         self.__file_system.write_text_to_file(file_path=temp_path,
                                               content=self.__make_srt_format(subtitle_list))
