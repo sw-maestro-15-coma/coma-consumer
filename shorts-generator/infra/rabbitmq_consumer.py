@@ -42,6 +42,7 @@ class RabbitMQConsumer:
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)
             except Exception as e:
                 logging.error("shorts 생성 실패")
+                logging.error(e)
                 self.shorts_result_sender.send_fail(str(e), shorts_id=data['shortsId'])
 
             else:
