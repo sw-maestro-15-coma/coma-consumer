@@ -56,10 +56,8 @@ class RabbitMQConsumer:
             else:
                 logging.info("shorts 생성 성공")
                 self.shorts_result_sender.send_success(response)
-            finally:
-                ch.basic_ack(delivery_tag=method.delivery_tag)
 
         channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=False)
+        channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=True)
 
         channel.start_consuming()
