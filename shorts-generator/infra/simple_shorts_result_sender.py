@@ -25,4 +25,4 @@ class SimpleShortsResultSender(ShortsResultSender):
             "shortsId": shorts_id,
             "message": message
         }
-        requests.post(self.__API_SERVER_URL + "/fail", data=json.dumps(data), headers=headers)
+        requests.post(self.__API_SERVER_URL + "/shorts/fail", data=json.dumps(data), headers=headers)
