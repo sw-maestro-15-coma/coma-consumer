@@ -1,9 +1,11 @@
 from application.shorts_service import ShortsService
+from domain.file_system import FileSystem
 from domain.id_generator import IdGenerator
 from domain.shorts_processor import ShortsProcessor
 from domain.shorts_repository import ShortsRepository
 from domain.shorts_result_sender import ShortsResultSender
 from domain.shorts_thumbnail_maker import ShortsThumbnailMaker
+from domain.subtitle_file_maker import SubtitleFileMaker
 from infra.ffmpeg_shorts_processor import FfmpegShortsProcessor
 from infra.ffmpeg_shorts_thumbnail_maker import FfmpegShortsThumbnailMaker
 from infra.rabbitmq_consumer import RabbitMQConsumer
@@ -17,24 +19,40 @@ class ObjectFactory:
         return RabbitMQConsumer(shorts_service=cls.shorts_service(),
                                 shorts_result_sender=cls.shorts_result_sender())
 
+
     @classmethod
     def shorts_service(cls) -> ShortsService:
         return ShortsService(shorts_processor=cls.shorts_processor(),
                              shorts_repository=cls.shorts_repository(),
-                             shorts_thumbnail_maker=cls.shorts_thumbnail_maker())
+                             shorts_thumbnail_maker=cls.shorts_thumbnail_maker(),
+                             file_system=cls.file_system(),
+                             subtitle_file_maker=cls.subtitle_file_maker())
 
     @classmethod
     def shorts_processor(cls) -> ShortsProcessor:
         return FfmpegShortsProcessor()
 
+
     @classmethod
     def shorts_repository(cls) -> ShortsRepository:
-        return S3ShortsRepository()
+        return S3ShortsRepository(cls.file_system())
+
 
     @classmethod
     def shorts_result_sender(cls) -> ShortsResultSender:
         return SimpleShortsResultSender()
 
+
     @classmethod
     def shorts_thumbnail_maker(cls) -> ShortsThumbnailMaker:
         return FfmpegShortsThumbnailMaker()
+
+
+    @classmethod
+    def subtitle_file_maker(cls) -> SubtitleFileMaker:
+        return SubtitleFileMaker(cls.file_system())
+
+
+    @classmethod
+    def file_system(cls) -> FileSystem:
+        return FileSystem()

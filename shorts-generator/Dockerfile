@@ -1,6 +1,7 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 COPY . /app
+RUN mkdir input
 RUN mkdir output
 RUN mkdir text
 RUN mkdir thumbnail

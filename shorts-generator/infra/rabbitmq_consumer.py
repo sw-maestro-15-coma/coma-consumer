@@ -17,6 +17,7 @@ class RabbitMQConsumer:
         self.shorts_service = shorts_service
         self.shorts_result_sender = shorts_result_sender
 
+
     def start(self) -> None:
         connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202"))
         channel: BlockingChannel = connection.channel()
@@ -41,8 +42,8 @@ class RabbitMQConsumer:
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)
             except Exception as e:
                 logging.error("shorts 생성 실패")
-                self.shorts_result_sender.send_fail("쇼츠 생성에 실패했습니다", shorts_id=data['shortsId'])
-                raise e
+                self.shorts_result_sender.send_fail(str(e), shorts_id=data['shortsId'])
+
             else:
                 logging.info("shorts 생성 성공")
                 self.shorts_result_sender.send_success(response)

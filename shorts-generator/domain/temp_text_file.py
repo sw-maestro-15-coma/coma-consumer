@@ -2,29 +2,27 @@ import os
 from typing import AnyStr
 
 from config import Config
+from domain.file_system import FileSystem
 from domain.id_generator import IdGenerator
 
 
 class TempTextFile:
-    def __init__(self) -> None:
+    def __init__(self, file_system: FileSystem) -> None:
         uuid: int = IdGenerator.make_id()
+        self.__file_system = file_system
         self.__text_file_path: str = Config.text_path() + f"/{uuid}.txt"
+
 
     def get_text_path(self):
         return self.__text_file_path
 
+
     def write_to_file(self, top_title: str) -> None:
-        self.__make_dir_if_not_exists()
-
-        with open(self.__text_file_path, "w+t") as file:
-            file.write(top_title)
-
-    def __make_dir_if_not_exists(self) -> None:
         self.__check_null()
-        dir_name: AnyStr = os.path.dirname(self.__text_file_path)
+        self.__file_system.make_dir_if_not_exists(self.__text_file_path)
 
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
+        self.__file_system.write_text_to_file(self.__text_file_path, top_title)
+
 
     def __check_null(self):
         if not self.__text_file_path:
