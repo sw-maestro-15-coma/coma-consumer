@@ -10,7 +10,6 @@ from domain.shorts_result_sender import ShortsResultSender
 from dto.shorts_request_message import ShortsRequestMessage
 from dto.shorts_response_message import ShortsResponseMessage
 from dto.subtitle import Subtitle
-from main import start
 
 
 class RabbitMQConsumer:
