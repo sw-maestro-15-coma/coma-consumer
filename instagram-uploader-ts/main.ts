@@ -1,3 +1,8 @@
 import {startConsume} from "./consumer";
 
-startConsume();
+function main(): void {
+    startConsume()
+        .catch(console.error);
+}
+
+main();

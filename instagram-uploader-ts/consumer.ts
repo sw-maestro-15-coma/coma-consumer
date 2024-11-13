@@ -47,7 +47,7 @@ const consume = async (msg:Message | null): Promise<void> => {
     deleteTempFiles(shortsPath, thumbnailPath);
 };
 
-const QUEUE_ADDR = "amqp://54.180.140.202"
+const QUEUE_ADDR = "amqp://54.180.140.202";
 
 export const startConsume = async (): Promise<void> => {
     amqp.connect(QUEUE_ADDR, (err0, connection: Connection) => {
@@ -68,15 +68,11 @@ export const startConsume = async (): Promise<void> => {
 
             channel.consume(queueName, (msg: Message | null) => {
                 consume(msg)
-                    .then(() => {
-                        channel.ack(msg!);
-                    })
                     .catch((err) => {
                         console.error("instagram uploader 컨슈머 내부 오류 발생");
                         console.error(err);
-                        channel.ack(msg!);
                     });
-            }, {noAck: false});
+            }, {noAck: true});
         });
     });
 };
