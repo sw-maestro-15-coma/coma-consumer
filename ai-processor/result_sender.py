@@ -19,10 +19,10 @@ def send_success(draft_id: int, title: str, edit_point: EditPoint) -> None:
     requests.post(__API_SERVER_URL + "/ai", data=json.dumps(data), headers=headers)
 
 
-def send_fail(error_message: str)-> None:
+def send_fail(draft_id: int, error_message: str)-> None:
     headers = {'Content-Type': 'application/json; charset=utf-8'}
     data = {
-        "shortsId": 0,
+        "draftId": draft_id,
         "message": error_message
     }
-    requests.post(__API_SERVER_URL + "/fail", data=json.dumps(data), headers=headers)
+    requests.post(__API_SERVER_URL + "/ai/fail", data=json.dumps(data), headers=headers)

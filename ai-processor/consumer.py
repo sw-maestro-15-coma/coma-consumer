@@ -57,7 +57,7 @@ def callback(ch: Channel,
 
 
 def start_consume():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(__QUEUE_IP))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(__QUEUE_IP, heartbeat=60))
     channel = connection.channel()
 
     channel.queue_declare(queue=__QUEUE_NAME)
