@@ -53,21 +53,27 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
     )
 
     model = "gpt-4o-mini"
-    query = ("Find the funniest point in the subscription."
-             "Result Format is HH:MM:SS~HH:MM:SS."
-             "Don't mention any other sentence. Just show me HH:MM:SS~HH:MM:SS."
-             "And minimum interval is 30 seconds, and Maximum interval is 1 Minutes."
-             "The following shows the whole subscription:"
-             f"{subscription}")
+    query = (
+        "Analyze the following transcript and identify the funniest continuous interval "
+        "that is between 30 seconds and 1 minute long. Evaluate multiple intervals "
+        "and choose the one with the highest humor impact. "
+        "Provide the result in HH:MM:SS~HH:MM:SS format. "
+        f"Transcript: {subscription}"
+    )
 
-    messages = [{
-        "role": "system",
-        "content": ("You are an expert in generating catchy and engaging titles specifically for YouTube Shorts. "
-                    "Your goal is to create titles that are eye-catching and entertaining.")
-    }, {
-        "role": "user",
-        "content": query
-    }]
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are an expert at analyzing transcripts to identify the funniest moments. "
+                "Your goal is to select a continuous interval of humor that will be most engaging for viewers."
+            ),
+        },
+        {
+            "role": "user",
+            "content": query,
+        },
+    ]
 
     try:
         response: ChatCompletion = client.chat.completions.create(model=model,
@@ -83,14 +89,3 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
     end: int = hhmmss_to_seconds(answers[1])
 
     return EditPoint(start=start, end=end)
-
-
-
-def test_start():
-    subscription = ""
-    with open('test_subscription.txt', 'r') as file:
-        for line in file.readlines():
-            subscription += line
-
-    answer = create_shorts_title_gpt(subscription)
-    print(answer)
