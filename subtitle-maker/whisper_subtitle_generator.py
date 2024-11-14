@@ -15,6 +15,7 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
         result = self.__align_whisper_output(audio, result) # 단어 별 스탬프가 필요하면 사용
 
         words = sum(list(map(lambda x: x["words"], result["segments"])), [])
+        words = self.__fill_no_start_and_end(words)
 
         subtitles: list[Subtitle] = list(map(lambda x: Subtitle(x["start"], x["end"], x["word"]), words))
 
@@ -56,6 +57,21 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
 
         # print(result["segments"])  # after alignment
         return result
+
+    def __fill_no_start_and_end(self, words):
+        for i in range(len(words)):
+            if "start" not in words[i]:
+                if i == 0:
+                    words[i]["start"] = 0
+                else:
+                    words[i]["start"] = words[i - 1]["end"]
+            if "end" not in words[i]:
+                if i == len(words) - 1:
+                    words[i]["end"] = words[i]["start"] + 1
+                else:
+                    words[i]["end"] = words[i + 1]["start"]
+
+        return words
 
 
 subtitle_generator: SubtitleGenerator = WhisperXSubtitleGenerator()
