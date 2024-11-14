@@ -49,11 +49,9 @@ def callback(ch: Channel,
 
     except Exception as e:
         __logger.error(e)
-        send_fail(str(e))
+        send_fail(draft_id=draft_id, error_message=str(e))
     else:
         send_success(draft_id=draft_id, title=title, edit_point=edit_point)
-    finally:
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 def start_consume():
@@ -62,7 +60,7 @@ def start_consume():
 
     channel.queue_declare(queue=__QUEUE_NAME)
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue=__QUEUE_NAME, on_message_callback=callback, auto_ack=False)
+    channel.basic_consume(queue=__QUEUE_NAME, on_message_callback=callback, auto_ack=True)
 
     channel.start_consuming()
 
