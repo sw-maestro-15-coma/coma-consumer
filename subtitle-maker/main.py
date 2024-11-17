@@ -82,16 +82,14 @@ def start():
             logging.error("shorts 생성 실패")
             print(e)
             logging.error(e)
-            send_fail("쇼츠 생성에 실패했습니다", shorts_id=999) #shorts_id=data['shortsId'])
+            send_fail("쇼츠 생성에 실패했습니다", shorts_id=data['shortsId'])
             # raise e
         else:
             logging.info("shorts 생성 성공")
             send_success(data['videoId'], response)
-        finally:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue='video-subtitle-generate', on_message_callback=callback, auto_ack=False)
+    channel.basic_consume(queue='video-subtitle-generate', on_message_callback=callback, auto_ack=True)
 
     channel.start_consuming()
 
