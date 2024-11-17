@@ -58,6 +58,7 @@ def create_shorts_edit_point(subscription: str) -> EditPoint:
         "that is between 30 seconds and 1 minute long. Evaluate multiple intervals "
         "and choose the one with the highest humor impact. "
         "Provide the result in HH:MM:SS~HH:MM:SS format. "
+        "Don't say anything else just show me HH:MM:SS~HH:MM:SS "
         f"Transcript: {subscription}"
     )
 
