@@ -64,7 +64,7 @@ def send_fail(message: str, shorts_id: int):
 
 
 def start():
-    connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202"))
+    connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=60))
     channel: BlockingChannel = connection.channel()
     channel.queue_declare(queue='video-subtitle-generate')
 
