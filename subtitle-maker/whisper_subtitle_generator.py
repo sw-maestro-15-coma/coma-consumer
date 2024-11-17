@@ -69,7 +69,12 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
                 if i == len(words) - 1:
                     words[i]["end"] = words[i]["start"] + 1
                 else:
-                    words[i]["end"] = words[i + 1]["start"]
+                    for j in range(i + 1, len(words)):
+                        if "start" in words[j]:
+                            words[i]["end"] = words[j]["start"]
+                            break
+                    else:
+                        words[i]["end"] = words[i]["start"] + 1
 
         return words
 
