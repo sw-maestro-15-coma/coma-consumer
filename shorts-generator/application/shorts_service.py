@@ -1,5 +1,3 @@
-import os
-
 from domain.file_system import FileSystem
 from domain.time_formatter import TimeFormatter
 from domain.shorts_processor import ShortsProcessor
