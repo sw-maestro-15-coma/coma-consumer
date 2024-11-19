@@ -54,19 +54,16 @@ def send_success(videoId: int, subtitle: SubtitleResult):
     requests.post("https://api.cotuber.com/api/v1/message/subtitle", data=json.dumps(data), headers=headers)
 
 
-def send_fail(message: str, shorts_id: int):
+def send_fail(message: str, video_id: int):
     headers = {'Content-Type': 'application/json; charset=utf-8'}
     data = {
-        "shortsId": shorts_id,
+        "videoId": video_id,
         "message": message
     }
-    requests.post("https://api.cotuber.com/api/v1/message/fail", data=json.dumps(data), headers=headers)
+    requests.post("https://api.cotuber.com/api/v1/message/subtitle/fail", data=json.dumps(data), headers=headers)
 
 
 def start():
-    connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=60))
-    channel: BlockingChannel = connection.channel()
-    channel.queue_declare(queue='video-subtitle-generate')
 
     def callback(ch: BlockingChannel, method, properties, body):
         data: dict = json.loads(body.decode('utf-8'))
@@ -82,16 +79,26 @@ def start():
             logging.error("shorts 생성 실패")
             print(e)
             logging.error(e)
-            send_fail("쇼츠 생성에 실패했습니다", shorts_id=999)
+            send_fail("쇼츠 생성에 실패했습니다", video_id=data['videoId'])
             # raise e
         else:
             logging.info("shorts 생성 성공")
             send_success(data['videoId'], response)
 
-    channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue='video-subtitle-generate', on_message_callback=callback, auto_ack=True)
+    while True:
+        try:
+            connection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=1200))
+            channel: BlockingChannel = connection.channel()
+            channel.queue_declare(queue='video-subtitle-generate')
 
-    channel.start_consuming()
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(queue='video-subtitle-generate', on_message_callback=callback, auto_ack=True)
+
+            channel.start_consuming()
+        except Exception as e:
+            logging.error("rabbitmq 연결 실패")
+            logging.error(e)
+
 
 
 if __name__ == "__main__":
