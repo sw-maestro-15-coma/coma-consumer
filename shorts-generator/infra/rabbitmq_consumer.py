@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 import pika
 from pika.adapters.blocking_connection import BlockingConnection, BlockingChannel
@@ -21,10 +22,6 @@ class RabbitMQConsumer:
 
 
     def start(self) -> None:
-        connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=60))
-        channel: BlockingChannel = connection.channel()
-        channel.queue_declare(queue=Config.queue_name())
-
         def callback(ch: BlockingChannel, method, properties, body):
             try:
                 data: dict = json.loads(body.decode('utf-8'))
@@ -41,11 +38,11 @@ class RabbitMQConsumer:
                     subtitle_list.append(temp)
 
                 message = ShortsRequestMessage(shorts_id=data['shortsId'],
-                                           video_s3_url=data['videoS3Url'],
-                                           top_title=data['topTitle'],
-                                           start_time=data['startTime'],
-                                           end_time=data['endTime'],
-                                           subtitle_list=subtitle_list)
+                                               video_s3_url=data['videoS3Url'],
+                                               top_title=data['topTitle'],
+                                               start_time=data['startTime'],
+                                               end_time=data['endTime'],
+                                               subtitle_list=subtitle_list)
 
                 response: ShortsResponseMessage = self.shorts_service.make_shorts(message)
             except Exception as e:
@@ -57,8 +54,15 @@ class RabbitMQConsumer:
                 logging.info("shorts 생성 성공")
                 self.shorts_result_sender.send_success(response)
 
+        while True:
+            try:
+                connection: BlockingConnection = pika.BlockingConnection(pika.ConnectionParameters("54.180.140.202", heartbeat=600))
+                channel: BlockingChannel = connection.channel()
+                channel.queue_declare(queue=Config.queue_name())
 
-        channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=True)
+                channel.basic_qos(prefetch_count=1)
+                channel.basic_consume(queue=Config.queue_name(), on_message_callback=callback, auto_ack=True)
 
-        channel.start_consuming()
+                channel.start_consuming()
+            except Exception as e:
+                logging.error(e)
