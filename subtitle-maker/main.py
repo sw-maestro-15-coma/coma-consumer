@@ -4,13 +4,14 @@ import uvicorn
 import pika
 import logging
 import requests
-from pika.adapters.blocking_connection import BlockingConnection, BlockingChannel
+from pika.adapters.blocking_connection import BlockingChannel
 
 from rearrange_subtitle import SubtitleReconstructor
 from subtitle import SubtitleResult
 from whisper_subtitle_generator import subtitle_generator
 from s3 import download_video, delete_video
 from convert_audio import convert_audio, delete_audio
+from kiwi_sentence_end_checker import sentence_end_checker
 
 import json
 
@@ -40,7 +41,7 @@ def logic(video_id: int, s3_url: str) -> SubtitleResult:
     subtitle = subtitle_generator.generate_subtitle(audio_path)
     delete_audio(audio_path)
 
-    rearrange_subtitle = SubtitleReconstructor().reconstruct(subtitle.subtitles)
+    rearrange_subtitle = SubtitleReconstructor(sentence_end_checker).reconstruct(subtitle.subtitles)
 
     return rearrange_subtitle
 
@@ -64,7 +65,6 @@ def send_fail(message: str, video_id: int):
 
 
 def start():
-
     def callback(ch: BlockingChannel, method, properties, body):
         data: dict = json.loads(body.decode('utf-8'))
 
@@ -98,7 +98,6 @@ def start():
         except Exception as e:
             logging.error("rabbitmq 연결 실패")
             logging.error(e)
-
 
 
 if __name__ == "__main__":

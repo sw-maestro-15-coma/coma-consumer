@@ -12,7 +12,7 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
 
     def generate_subtitle(self, audio_path: str) -> SubtitleResult:
         audio, result = self.__transcribe_with_original_whisper(audio_path)
-        result = self.__align_whisper_output(audio, result) # 단어 별 스탬프가 필요하면 사용
+        result = self.__align_whisper_output(audio, result)
 
         words = sum(list(map(lambda x: x["words"], result["segments"])), [])
         words = self.__fill_no_start_and_end(words)
@@ -42,7 +42,6 @@ class WhisperXSubtitleGenerator(SubtitleGenerator):
         print(result["segments"])  # before alignment
         return audio, result
 
-    # 단어 별 스탬프가 필요하면 사용
     def __align_whisper_output(self, audio, result):
         model_a, metadata = whisperx.load_align_model(language_code=result["language"], device=self.__device)
 
